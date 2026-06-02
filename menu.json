@@ -1,0 +1,58 @@
+{
+  "categories": [
+    {
+      "id": "palov",
+      "name": "Palov & Guruch taomlar",
+      "icon": "🍛",
+      "items": [
+        { "id": 1, "name": "Sum Palov (Klassik)", "price": 35000, "desc": "An'anaviy o'zbek palovi, go'sht va sabzavot bilan", "emoji": "🍛" },
+        { "id": 2, "name": "Toʻy Palovi", "price": 45000, "desc": "Bayramona palov, qo'zi go'shti bilan", "emoji": "🍲" },
+        { "id": 3, "name": "Qozon Kabob", "price": 50000, "desc": "Qozonda pishirilgan go'sht va kartoshka", "emoji": "🥘" }
+      ]
+    },
+    {
+      "id": "sho'rva",
+      "name": "Sho'rva & Oshxo'rak",
+      "icon": "🍜",
+      "items": [
+        { "id": 4, "name": "Lag'mon", "price": 30000, "desc": "Qo'lda tortilgan xamir, go'sht va sabzavot bilan", "emoji": "🍜" },
+        { "id": 5, "name": "Mastava", "price": 28000, "desc": "Guruchli sho'rva, go'sht bilan", "emoji": "🍵" },
+        { "id": 6, "name": "Moshovurda", "price": 25000, "desc": "Mosh va guruch qo'shib pishirilgan sho'rva", "emoji": "🥣" },
+        { "id": 7, "name": "Shurpa", "price": 32000, "desc": "Qo'zi go'shti bilan qaynatilgan sho'rva", "emoji": "🍲" }
+      ]
+    },
+    {
+      "id": "kabob",
+      "name": "Kabob & Grill",
+      "icon": "🔥",
+      "items": [
+        { "id": 8, "name": "Shashlik (100g)", "price": 18000, "desc": "Mangalda pishirilgan qo'zi go'shti", "emoji": "🍢" },
+        { "id": 9, "name": "Tikka Kabob", "price": 22000, "desc": "Ziravorlarda marinад qilingan go'sht", "emoji": "🥩" },
+        { "id": 10, "name": "Lula Kabob", "price": 20000, "desc": "Qiyma go'shtdan tayyor kabob", "emoji": "🌯" },
+        { "id": 11, "name": "Tovuq Kabob", "price": 16000, "desc": "Marinadlangan tovuq go'shti", "emoji": "🍗" }
+      ]
+    },
+    {
+      "id": "non",
+      "name": "Non & Somsa",
+      "icon": "🫓",
+      "items": [
+        { "id": 12, "name": "Tandir Non", "price": 5000, "desc": "Tandir nonning yangi pishirilgani", "emoji": "🫓" },
+        { "id": 13, "name": "Somsa (1 dona)", "price": 6000, "desc": "Tandirda pishirilgan go'shtli somsa", "emoji": "🥐" },
+        { "id": 14, "name": "Qatlama", "price": 8000, "desc": "Qatlamali yog'li non", "emoji": "🥞" }
+      ]
+    },
+    {
+      "id": "ichimlik",
+      "name": "Ichimliklar",
+      "icon": "🥤",
+      "items": [
+        { "id": 15, "name": "Ko'k Choy", "price": 5000, "desc": "Arzon bali ko'k choy", "emoji": "🍵" },
+        { "id": 16, "name": "Qora Choy", "price": 5000, "desc": "Issiq qora choy", "emoji": "☕" },
+        { "id": 17, "name": "Kompot", "price": 8000, "desc": "Meva-sabzavotli kompot", "emoji": "🍹" },
+        { "id": 18, "name": "Ayron", "price": 7000, "desc": "Yangi tayyorlangan ayron", "emoji": "🥛" },
+        { "id": 19, "name": "Coca-Cola (0.5L)", "price": 10000, "desc": "Sovuq Coca-Cola", "emoji": "🥤" }
+      ]
+    }
+  ]
+}

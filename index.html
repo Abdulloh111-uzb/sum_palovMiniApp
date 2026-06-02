@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sum Palov</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --bg: #1a1a2e;
+  --bg2: #16213e;
+  --bg3: #0f3460;
+  --card: #1e1e3a;
+  --card2: #252545;
+  --accent: #4fc3f7;
+  --accent2: #29b6f6;
+  --gold: #ffa726;
+  --text: #ffffff;
+  --text2: #b0bec5;
+  --text3: #78909c;
+  --green: #66bb6a;
+  --red: #ef5350;
+  --r: 14px;
+  --r2: 10px;
+}
+html, body { height:100%; background: var(--bg); overflow:hidden; }
+body { font-family:'Inter',sans-serif; color:var(--text); }
+.app { display:flex; flex-direction:column; height:100vh; max-width:480px; margin:0 auto; background: var(--bg); }
+
+.header {
+  background: var(--bg2);
+  padding: 12px 16px 0;
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  position: relative; z-index: 10;
+}
+.header-top { display:flex; align-items:center; justify-content:space-between; margin-bottom: 12px; }
+.header-logo { display:flex; align-items:center; gap:10px; }
+.logo-icon {
+  width:38px; height:38px;
+  background: linear-gradient(135deg, var(--gold), #ff7043);
+  border-radius: 10px;
+  display:flex; align-items:center; justify-content:center; font-size:20px;
+  overflow:hidden;
+}
+.logo-icon img { width:38px; height:38px; object-fit:cover; border-radius:10px; }
+.logo-name { font-size:20px; font-weight:800; color:var(--text); line-height:1.1; }
+.logo-sub { font-size:10px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; }
+.hcart {
+  position:relative; width:38px; height:38px;
+  background:var(--card2); border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:20px; transition:background 0.2s;
+}
+.hcart:hover { background:var(--bg3); }
+.cbadge {
+  position:absolute; top:-4px; right:-4px;
+  background:var(--red); color:#fff;
+  font-size:9px; font-weight:700;
+  min-width:16px; height:16px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center; padding:0 3px;
+}
+.cbadge.h { display:none; }
+
+.nav { display:flex; margin-top:4px; }
+.nitem {
+  flex:1; padding:10px 4px 8px;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  cursor:pointer; transition:all 0.2s;
+  border-bottom:3px solid transparent;
+  color:var(--text3); font-size:11px; font-weight:500;
+  background:none; border-top:none; border-left:none; border-right:none;
+  font-family:'Inter',sans-serif; letter-spacing:0.3px;
+}
+.nitem svg { width:22px; height:22px; stroke:currentColor; }
+.nitem.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+.content { flex:1; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; }
+.content::-webkit-scrollbar { width:0; }
+.page { display:none; }
+.page.active { display:block; animation: fi 0.22s ease; }
+@keyframes fi { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+
+/* CATALOG */
+.catalog-wrap { padding:16px; }
+.cat-banner {
+  border-radius: var(--r); overflow:hidden;
+  margin-bottom:14px; cursor:pointer;
+  position:relative; height:170px;
+  transition:transform 0.2s; background:var(--card);
+}
+.cat-banner:active { transform:scale(0.98); }
+.cbg {
+  width:100%; height:100%; object-fit:cover; display:block;
+}
+.cover {
+  position:absolute; inset:0;
+  background: linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.25) 60%, transparent 100%);
+}
+.blabel {
+  position:absolute; bottom:16px; left:18px;
+  font-size:22px; font-weight:800; color:#fff;
+  text-shadow:0 2px 8px rgba(0,0,0,0.7);
+}
+.bcnt {
+  position:absolute; top:12px; right:12px;
+  background:rgba(0,0,0,0.55); backdrop-filter:blur(4px);
+  color:var(--accent); font-size:10px; font-weight:600;
+  padding:4px 10px; border-radius:20px;
+}
+.bnew {
+  position:absolute; top:0; left:0;
+  background:var(--red); color:#fff;
+  font-size:10px; font-weight:700;
+  padding:6px 14px; border-radius:0 0 var(--r2) 0;
+}
+
+/* ITEMS */
+.items-hd {
+  padding:16px 16px 10px;
+  display:flex; align-items:center; gap:12px;
+}
+.back {
+  width:34px; height:34px; background:var(--card2);
+  border-radius:9px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:18px; flex-shrink:0;
+  transition:background 0.2s; color:var(--text);
+  border:none; font-family:'Inter',sans-serif;
+}
+.back:hover { background:var(--bg3); }
+.items-ttl { font-size:22px; font-weight:800; color:var(--text); }
+.grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:14px; padding:0 16px 24px;
+}
+.icard {
+  background:var(--card); border-radius:var(--r);
+  overflow:hidden; cursor:pointer;
+  transition:transform 0.2s, box-shadow 0.2s;
+  border:1px solid rgba(255,255,255,0.05);
+}
+.icard:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+.icard:active { transform:scale(0.97); }
+.iimgw {
+  width:100%; height:145px; position:relative;
+  background:linear-gradient(135deg,#2a2a4a,#1a1a3a); overflow:hidden;
+}
+.iimgw img {
+  width:100%; height:100%; object-fit:cover; display:block;
+  transition:transform 0.3s;
+}
+.icard:hover .iimgw img { transform:scale(1.06); }
+.iimgph {
+  position:absolute; inset:0;
+  display:none; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,#2a2a4a,#1a1a3a);
+  font-size:40px; text-align:center; padding:8px;
+}
+.ibody { padding:10px 10px 12px; }
+.iprice { font-size:14px; font-weight:700; color:var(--text); margin-bottom:3px; }
+.iname { font-size:12px; color:var(--text2); margin-bottom:10px; line-height:1.3; }
+.gbtn {
+  width:100%; padding:9px;
+  background:linear-gradient(135deg,var(--accent2),var(--bg3));
+  border:none; border-radius:8px;
+  color:#fff; font-family:'Inter',sans-serif;
+  font-size:13px; font-weight:600;
+  cursor:pointer; transition:all 0.2s;
+}
+.gbtn:hover { filter:brightness(1.15); }
+.gbtn:active { transform:scale(0.97); }
+.gbtn.added { background:linear-gradient(135deg,var(--green),#2e7d32); }
+
+/* DETAIL SHEET */
+.doverlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.85); z-index:500;
+  backdrop-filter:blur(6px);
+  max-width:480px; left:50%; transform:translateX(-50%);
+}
+.doverlay.open { display:flex; flex-direction:column; }
+.dsheet {
+  margin-top:auto; background:var(--bg2);
+  border-radius:22px 22px 0 0;
+  border-top:1px solid rgba(255,255,255,0.08);
+  max-height:90vh; overflow-y:auto; position:relative;
+  animation:sup 0.32s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes sup { from{transform:translateY(100%);opacity:0;} to{transform:translateY(0);opacity:1;} }
+.dimgw {
+  width:100%; height:255px;
+  background:linear-gradient(135deg,#2a2a4a,#1a1a3a);
+  position:relative; overflow:hidden; border-radius:22px 22px 0 0;
+}
+.dimgw img { width:100%; height:100%; object-fit:cover; display:block; border-radius:22px 22px 0 0; }
+.dimgph {
+  width:100%; height:100%; display:none;
+  flex-direction:column; align-items:center; justify-content:center;
+  gap:8px; border-radius:22px 22px 0 0;
+  font-size:60px; text-align:center; padding:16px;
+}
+.dcls {
+  position:absolute; top:14px; right:14px;
+  width:32px; height:32px; background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(6px); border:none; border-radius:50%;
+  color:#fff; font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  z-index:5; transition:background 0.2s;
+}
+.dcls:hover { background:rgba(0,0,0,0.85); }
+.dbody { padding:20px 20px 36px; }
+.dtag {
+  display:inline-block; background:rgba(79,195,247,0.14);
+  color:var(--accent); font-size:10px; font-weight:600;
+  letter-spacing:1px; text-transform:uppercase;
+  padding:4px 10px; border-radius:6px; margin-bottom:10px;
+}
+.dname { font-size:24px; font-weight:800; color:var(--text); margin-bottom:8px; line-height:1.2; }
+.ddesc { font-size:13px; color:var(--text2); line-height:1.7; margin-bottom:16px; }
+.dchips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+.chip {
+  background:var(--card2); border:1px solid rgba(255,255,255,0.06);
+  border-radius:8px; padding:6px 12px;
+  font-size:11px; color:var(--text2);
+  display:flex; align-items:center; gap:5px;
+}
+.chip strong { color:var(--text); font-weight:600; }
+.prow {
+  background:var(--card); border-radius:var(--r2);
+  padding:14px 16px; margin-bottom:14px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.plbl { font-size:11px; color:var(--text3); margin-bottom:3px; }
+.pbig { font-size:26px; font-weight:800; color:var(--accent); }
+.qrow { display:flex; align-items:center; gap:14px; }
+.qbtn {
+  width:34px; height:34px;
+  background:var(--card2); border:1px solid rgba(255,255,255,0.07);
+  border-radius:9px; color:var(--text); font-size:20px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:background 0.2s;
+}
+.qbtn:hover { background:var(--bg3); }
+.qn { font-size:17px; font-weight:700; min-width:20px; text-align:center; }
+.dobtn {
+  width:100%; padding:15px;
+  background:linear-gradient(135deg,var(--accent2),var(--bg3));
+  border:none; border-radius:var(--r2);
+  color:#fff; font-family:'Inter',sans-serif;
+  font-size:15px; font-weight:700;
+  cursor:pointer; transition:all 0.2s;
+}
+.dobtn:hover { filter:brightness(1.12); transform:translateY(-1px); }
+
+/* ORDER MODAL */
+.ooverlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.85); z-index:600;
+  backdrop-filter:blur(6px);
+  max-width:480px; left:50%; transform:translateX(-50%);
+  align-items:flex-end;
+}
+.ooverlay.open { display:flex; }
+.osheet {
+  width:100%; background:var(--bg2);
+  border-radius:22px 22px 0 0;
+  border-top:1px solid rgba(255,255,255,0.08);
+  padding:24px 20px 36px;
+  animation:sup 0.32s cubic-bezier(0.34,1.56,0.64,1);
+}
+.oshttl { font-size:18px; font-weight:800; margin-bottom:4px; }
+.oshsub { font-size:12px; color:var(--text3); margin-bottom:20px; }
+.oitem-prev {
+  background:var(--card); border-radius:var(--r2);
+  padding:12px 14px; display:flex; gap:12px; align-items:center;
+  margin-bottom:20px; border:1px solid rgba(255,255,255,0.04);
+}
+.oipimg {
+  width:54px; height:54px; border-radius:9px;
+  object-fit:cover; background:var(--card2); flex-shrink:0;
+}
+.oipimgph {
+  width:54px; height:54px; border-radius:9px;
+  background:var(--card2); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; text-align:center;
+}
+.oipinfo { flex:1; min-width:0; }
+.oipname { font-size:13px; font-weight:600; margin-bottom:2px; }
+.oipqty { font-size:11px; color:var(--text3); }
+.oiptotal { font-size:15px; font-weight:700; color:var(--accent); }
+
+.flbl { font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.7px; margin-bottom:7px; }
+.finp {
+  width:100%; padding:13px 14px;
+  background:var(--card); border:1px solid rgba(255,255,255,0.08);
+  border-radius:var(--r2); color:var(--text);
+  font-family:'Inter',sans-serif; font-size:14px;
+  margin-bottom:14px; outline:none; transition:border-color 0.2s;
+}
+.finp:focus { border-color:var(--accent); }
+.finp::placeholder { color:var(--text3); }
+.fsubmit {
+  width:100%; padding:15px;
+  background:linear-gradient(135deg,var(--gold),#ff7043);
+  border:none; border-radius:var(--r2);
+  color:#fff; font-family:'Inter',sans-serif;
+  font-size:15px; font-weight:700; margin-top:4px;
+  cursor:pointer; transition:all 0.2s;
+}
+.fsubmit:hover { filter:brightness(1.1); transform:translateY(-1px); }
+.fsubmit:active { transform:scale(0.98); }
+.fsubmit:disabled { opacity:0.5; cursor:not-allowed; }
+.fcancel {
+  width:100%; padding:12px;
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:var(--r2);
+  color:var(--text3); font-family:'Inter',sans-serif;
+  font-size:14px; font-weight:500; margin-top:10px;
+  cursor:pointer; transition:all 0.2s;
+}
+.fcancel:hover { border-color:rgba(255,255,255,0.2); color:var(--text2); }
+.ferr { font-size:12px; color:var(--red); margin-top:-10px; margin-bottom:12px; display:none; }
+.ferr.show { display:block; }
+
+/* ORDERS PAGE */
+.owrap { padding:16px; }
+.ottl { font-size:22px; font-weight:800; margin-bottom:4px; }
+.osub { font-size:11px; color:var(--text3); margin-bottom:16px; text-transform:uppercase; letter-spacing:0.5px; }
+.scard {
+  background:var(--card); border:1px solid rgba(79,195,247,0.15);
+  border-radius:var(--r); padding:14px 16px;
+  display:flex; justify-content:space-between; margin-bottom:16px;
+}
+.si .sl { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+.si .sv { font-size:20px; font-weight:800; color:var(--accent); }
+.ocard {
+  background:var(--card); border-radius:var(--r);
+  padding:12px; margin-bottom:10px;
+  border:1px solid rgba(255,255,255,0.04);
+}
+.ocard-top { display:flex; gap:12px; align-items:center; margin-bottom:10px; }
+.ocimg {
+  width:60px; height:60px; border-radius:10px;
+  object-fit:cover; background:var(--card2); flex-shrink:0;
+}
+.ocimgph {
+  width:60px; height:60px; border-radius:10px;
+  background:var(--card2); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px;
+}
+.ocinfo { flex:1; min-width:0; }
+.ocname { font-size:13px; font-weight:600; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ocmeta { font-size:11px; color:var(--text3); margin-bottom:5px; }
+.ocst { font-size:10px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; display:flex; align-items:center; gap:5px; }
+.sdot { width:6px; height:6px; border-radius:50%; animation:pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+.ocp { font-size:14px; font-weight:700; color:var(--accent); flex-shrink:0; }
+.ocard-detail {
+  background:var(--card2); border-radius:8px; padding:10px 12px;
+  display:flex; gap:6px; flex-direction:column;
+  border:1px solid rgba(255,255,255,0.04);
+}
+.ocd-row { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text3); }
+.ocd-row strong { color:var(--text2); font-weight:500; }
+.empty { text-align:center; padding:60px 20px; }
+.empty .ei { font-size:56px; opacity:0.3; margin-bottom:14px; }
+.empty h3 { font-size:17px; color:var(--text2); margin-bottom:6px; }
+.empty p { font-size:13px; color:var(--text3); }
+
+/* CONTACT */
+.cwrap { padding:16px; }
+.cttl { font-size:22px; font-weight:800; margin-bottom:4px; }
+.csub { font-size:11px; color:var(--text3); margin-bottom:16px; text-transform:uppercase; letter-spacing:0.5px; }
+.mapbox {
+  background:var(--card); border-radius:var(--r); height:140px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:8px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.04);
+}
+.mapbox .mi { font-size:38px; }
+.mapbox span { font-size:12px; color:var(--text3); }
+.ccard {
+  background:var(--card); border-radius:var(--r);
+  padding:15px 16px; margin-bottom:10px; display:flex; align-items:center; gap:14px;
+  border:1px solid rgba(255,255,255,0.04); transition:border-color 0.2s;
+}
+.ccard:hover { border-color:rgba(79,195,247,0.2); }
+.cic {
+  width:44px; height:44px;
+  background:rgba(79,195,247,0.1); border:1px solid rgba(79,195,247,0.15);
+  border-radius:11px; display:flex; align-items:center; justify-content:center;
+  font-size:21px; flex-shrink:0;
+}
+.clbl { font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:3px; }
+.cval { font-size:14px; font-weight:600; color:var(--text); }
+.hcard {
+  background:var(--card); border-radius:var(--r);
+  padding:15px 16px; margin-bottom:10px;
+  border:1px solid rgba(255,255,255,0.04);
+}
+.hlbl { font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:12px; }
+.hrow { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:13px; }
+.hrow:last-child { border:none; }
+.hday { color:var(--text2); }
+.htime { color:var(--accent); font-weight:500; }
+
+/* INFO */
+.infowrap { padding:16px; }
+.infocard {
+  background:var(--card); border-radius:var(--r);
+  padding:18px; margin-bottom:12px;
+  border:1px solid rgba(255,255,255,0.04);
+  display:flex; flex-direction:column; gap:8px;
+}
+.infocard .ie { font-size:32px; }
+.infocard .it { font-size:14px; font-weight:700; color:var(--text); }
+.infocard .id { font-size:13px; color:var(--text2); line-height:1.7; }
+
+/* TOAST */
+.toast {
+  position:fixed; bottom:14px;
+  left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--card2); border:1px solid rgba(79,195,247,0.3);
+  border-radius:12px; padding:11px 22px;
+  color:var(--text); font-size:13px; font-weight:500;
+  opacity:0; transition:all 0.3s; z-index:1000;
+  white-space:nowrap; max-width:300px; text-align:center;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* SUCCESS ANIMATION */
+.success-screen {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.9); z-index:700;
+  max-width:480px; left:50%; transform:translateX(-50%);
+  flex-direction:column; align-items:center; justify-content:center; gap:16px;
+}
+.success-screen.open { display:flex; animation:fi 0.3s ease; }
+.success-circle {
+  width:90px; height:90px; border-radius:50%;
+  background:linear-gradient(135deg,var(--green),#2e7d32);
+  display:flex; align-items:center; justify-content:center;
+  font-size:40px; animation:pop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes pop { from{transform:scale(0);} to{transform:scale(1);} }
+.success-ttl { font-size:22px; font-weight:800; color:var(--text); }
+.success-sub { font-size:14px; color:var(--text2); text-align:center; max-width:280px; line-height:1.6; }
+.success-btn {
+  margin-top:8px; padding:13px 32px;
+  background:linear-gradient(135deg,var(--accent2),var(--bg3));
+  border:none; border-radius:var(--r2);
+  color:#fff; font-family:'Inter',sans-serif;
+  font-size:14px; font-weight:700; cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-logo">
+        <div class="logo-icon">
+          <img src="assets/logo.jpg" alt="SP" onerror="this.parentElement.innerHTML='🍛'"/>
+        </div>
+        <div>
+          <div class="logo-name">Sum Palov</div>
+          <div class="logo-sub">Premium · Toshkent</div>
+        </div>
+      </div>
+      <div class="hcart" onclick="gp('orders','n-orders')">
+        🛒
+        <div class="cbadge h" id="cb">0</div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nitem active" id="n-catalog" onclick="gp('catalog','n-catalog')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Katalog
+      </button>
+      <button class="nitem" id="n-orders" onclick="gp('orders','n-orders')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+        Buyurtmalar
+      </button>
+      <button class="nitem" id="n-contact" onclick="gp('contact','n-contact')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 7.81a19.79 19.79 0 01-3.07-8.72A2 2 0 012.18 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 9.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        Aloqa
+      </button>
+      <button class="nitem" id="n-info" onclick="gp('info','n-info')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        Info
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- CATALOG -->
+    <div class="page active" id="page-catalog">
+      <div class="catalog-wrap">
+        <div class="cat-banner" onclick="openCat('palov')">
+          <img class="cbg" src="https://images.pexels.com/photos/7426934/pexels-photo-7426934.jpeg?auto=compress&cs=tinysrgb&w=700" alt="">
+          <div class="cover"></div>
+          <div class="blabel">Palov & Guruch</div>
+          <div class="bcnt">3 ta mahsulot</div>
+        </div>
+        <div class="cat-banner" onclick="openCat('shorva')">
+          <img class="cbg" src="https://images.pexels.com/photos/2347311/pexels-photo-2347311.jpeg?auto=compress&cs=tinysrgb&w=700" alt="">
+          <div class="cover"></div>
+          <div class="blabel">Sho'rva & Oshxo'rak</div>
+          <div class="bcnt">4 ta mahsulot</div>
+        </div>
+        <div class="cat-banner" onclick="openCat('kabob')">
+          <img class="cbg" src="https://images.pexels.com/photos/410648/pexels-photo-410648.jpeg?auto=compress&cs=tinysrgb&w=700" alt="">
+          <div class="cover"></div>
+          <div class="blabel">Kabob & Grill</div>
+          <div class="bcnt">4 ta mahsulot</div>
+        </div>
+        <div class="cat-banner" onclick="openCat('non')">
+          <img class="cbg" src="https://images.pexels.com/photos/1775043/pexels-photo-1775043.jpeg?auto=compress&cs=tinysrgb&w=700" alt="">
+          <div class="cover"></div>
+          <div class="blabel">Non & Somsa</div>
+          <div class="bcnt">3 ta mahsulot</div>
+        </div>
+        <div class="cat-banner" onclick="openCat('ichimlik')">
+          <img class="cbg" src="https://images.pexels.com/photos/1544943/pexels-photo-1544943.jpeg?auto=compress&cs=tinysrgb&w=700" alt="">
+          <div class="cover"></div>
+          <div class="blabel">Ichimliklar</div>
+          <div class="bcnt">5 ta mahsulot</div>
+          <div class="bnew">Yangi</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ITEMS -->
+    <div class="page" id="page-items">
+      <div class="items-hd">
+        <button class="back" onclick="gp('catalog','n-catalog')">←</button>
+        <div class="items-ttl" id="ittl"></div>
+      </div>
+      <div class="grid" id="igrid"></div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="page" id="page-orders">
+      <div class="owrap">
+        <div class="ottl">Buyurtmalar</div>
+        <div class="osub">Sizning buyurtmalaringiz</div>
+        <div id="oin"></div>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="page" id="page-contact">
+      <div class="cwrap">
+        <div class="cttl">Aloqa</div>
+        <div class="csub">Biz bilan bog'laning</div>
+        <div class="mapbox"><div class="mi">📍</div><span>Toshkent, Chilonzor tumani</span></div>
+        <div class="ccard"><div class="cic">📞</div><div><div class="clbl">Telefon 1</div><div class="cval">+998 90 123 45 67</div></div></div>
+        <div class="ccard"><div class="cic">📱</div><div><div class="clbl">Telefon 2</div><div class="cval">+998 91 987 65 43</div></div></div>
+        <div class="ccard"><div class="cic">📸</div><div><div class="clbl">Instagram</div><div class="cval">@sum_palov</div></div></div>
+        <div class="ccard"><div class="cic">📍</div><div><div class="clbl">Manzil</div><div class="cval">Chilonzor, Mustaqillik ko'ch. 45</div></div></div>
+        <div class="hcard">
+          <div class="hlbl">Ish vaqti</div>
+          <div class="hrow"><span class="hday">Dushanba – Juma</span><span class="htime">08:00 – 22:00</span></div>
+          <div class="hrow"><span class="hday">Shanba</span><span class="htime">08:00 – 23:00</span></div>
+          <div class="hrow"><span class="hday">Yakshanba</span><span class="htime">09:00 – 21:00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="page" id="page-info">
+      <div class="infowrap">
+        <div class="cttl" style="margin-bottom:4px;">Sum Palov</div>
+        <div class="csub">Biz haqimizda</div>
+        <div class="infocard"><div class="ie">🏆</div><div class="it">Premium o'zbek taomlari</div><div class="id">Sum Palov — Toshkentning eng mazali an'anaviy o'zbek taomlari restorani. Har kuni yangi va haqiqiy ta'mda taomlar tayyorlaymiz.</div></div>
+        <div class="infocard"><div class="ie">🚀</div><div class="it">Tez yetkazib berish</div><div class="id">Shahar bo'ylab 30-45 daqiqa ichida yetkazib beramiz. Minimal buyurtma: 30,000 so'm.</div></div>
+        <div class="infocard"><div class="ie">⭐</div><div class="it">Sifat kafolati</div><div class="id">Barcha taomlarimiz faqat yangi mahsulotlardan tayyorlanadi. 100% qoniqtirish kafolati.</div></div>
+        <div class="infocard"><div class="ie">💳</div><div class="it">To'lov usullari</div><div class="id">Naqd pul, Payme, Click, Uzcard va Visa/Mastercard qabul qilinadi.</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DETAIL SHEET -->
+<div class="doverlay" id="dov" onclick="dbgclick(event)">
+  <div class="dsheet">
+    <button class="dcls" onclick="cd()">✕</button>
+    <div class="dimgw" id="dimgw">
+      <div class="dimgph" id="dimgph"></div>
+    </div>
+    <div class="dbody">
+      <div class="dtag" id="dtag"></div>
+      <div class="dname" id="dname"></div>
+      <div class="ddesc" id="ddesc"></div>
+      <div class="dchips" id="dchips"></div>
+      <div class="prow">
+        <div><div class="plbl">Narxi</div><div class="pbig" id="dprice"></div></div>
+        <div class="qrow">
+          <button class="qbtn" onclick="dq(-1)">−</button>
+          <span class="qn" id="qn">1</span>
+          <button class="qbtn" onclick="dq(1)">+</button>
+        </div>
+      </div>
+      <button class="dobtn" id="dobtn" onclick="openOrderModal()">Buyurtma berish</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER MODAL -->
+<div class="ooverlay" id="oov" onclick="oovbgclick(event)">
+  <div class="osheet">
+    <div class="oshttl">Buyurtmani tasdiqlash</div>
+    <div class="oshsub">Ma'lumotlarni to'ldiring</div>
+
+    <div class="oitem-prev" id="oiprev"></div>
+
+    <div class="flbl">Ismingiz *</div>
+    <input class="finp" id="fname" type="text" placeholder="Ism Familiya">
+    <div class="ferr" id="fname-err">Ismingizni kiriting</div>
+
+    <div class="flbl">Telefon raqam *</div>
+    <input class="finp" id="fphone" type="tel" placeholder="+998 90 123 45 67" maxlength="20">
+    <div class="ferr" id="fphone-err">Telefon raqamni to'g'ri kiriting</div>
+
+    <div class="flbl">Yetkazib berish manzili *</div>
+    <input class="finp" id="faddress" type="text" placeholder="Ko'cha, uy raqami, kvartira">
+    <div class="ferr" id="faddress-err">Manzilni kiriting</div>
+
+    <div class="flbl">Izoh (ixtiyoriy)</div>
+    <input class="finp" id="fnote" type="text" placeholder="Masalan: 3-qavat, qo'ng'iroq qilmang...">
+
+    <button class="fsubmit" id="fsubmit" onclick="submitOrder()">Buyurtma berish</button>
+    <button class="fcancel" onclick="closeOrderModal()">Bekor qilish</button>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div class="success-screen" id="sscreen">
+  <div class="success-circle">✓</div>
+  <div class="success-ttl">Buyurtma qabul qilindi!</div>
+  <div class="success-sub" id="ssub">Tez orada operator siz bilan bog'lanadi.</div>
+  <button class="success-btn" onclick="closeSuccess()">Buyurtmalarni ko'rish</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  if(window.Telegram?.WebApp){
+    window.Telegram.WebApp.ready();
+    window.Telegram.WebApp.expand();
+  }
+})();
+
+const DB = {
+  palov: {
+    label: "Palov & Guruch taomlar",
+    items: [
+      {id:1,  name:"Sum Palov (Klassik)", desc:"An'anaviy o'zbek palovi, go'sht va sabzavot bilan", img:"https://images.pexels.com/photos/7426934/pexels-photo-7426934.jpeg?auto=compress&cs=tinysrgb&w=500", price:35000, emoji:"🍛", tag:"Palov"},
+      {id:2,  name:"To'y Palovi",         desc:"Bayramona palov, qo'zi go'shti bilan",              img:"https://images.pexels.com/photos/7426923/pexels-photo-7426923.jpeg?auto=compress&cs=tinysrgb&w=500", price:45000, emoji:"🍲", tag:"Palov"},
+      {id:3,  name:"Qozon Kabob",         desc:"Qozonda pishirilgan go'sht va kartoshka",           img:"https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg?auto=compress&cs=tinysrgb&w=500", price:50000, emoji:"🥘", tag:"Palov"},
+    ]
+  },
+  shorva: {
+    label: "Sho'rva & Oshxo'rak",
+    items: [
+      {id:4,  name:"Lag'mon",    desc:"Qo'lda tortilgan xamir, go'sht va sabzavot bilan", img:"https://images.pexels.com/photos/2347311/pexels-photo-2347311.jpeg?auto=compress&cs=tinysrgb&w=500", price:30000, emoji:"🍜", tag:"Sho'rva"},
+      {id:5,  name:"Mastava",    desc:"Guruchli sho'rva, go'sht bilan",                   img:"https://images.pexels.com/photos/1095550/pexels-photo-1095550.jpeg?auto=compress&cs=tinysrgb&w=500", price:28000, emoji:"🍵", tag:"Sho'rva"},
+      {id:6,  name:"Moshovurda", desc:"Mosh va guruch qo'shib pishirilgan sho'rva",        img:"https://images.pexels.com/photos/539451/pexels-photo-539451.jpeg?auto=compress&cs=tinysrgb&w=500",  price:25000, emoji:"🥣", tag:"Sho'rva"},
+      {id:7,  name:"Shurpa",     desc:"Qo'zi go'shti bilan qaynatilgan sho'rva",          img:"https://images.pexels.com/photos/3949676/pexels-photo-3949676.jpeg?auto=compress&cs=tinysrgb&w=500", price:32000, emoji:"🍲", tag:"Sho'rva"},
+    ]
+  },
+  kabob: {
+    label: "Kabob & Grill",
+    items: [
+      {id:8,  name:"Shashlik (100g)", desc:"Mangalda pishirilgan qo'zi go'shti",          img:"https://images.pexels.com/photos/410648/pexels-photo-410648.jpeg?auto=compress&cs=tinysrgb&w=500",   price:18000, emoji:"🍢", tag:"Kabob"},
+      {id:9,  name:"Tikka Kabob",     desc:"Ziravorlarda marinад qilingan go'sht",         img:"https://images.pexels.com/photos/1251198/pexels-photo-1251198.jpeg?auto=compress&cs=tinysrgb&w=500", price:22000, emoji:"🥩", tag:"Kabob"},
+      {id:10, name:"Lula Kabob",      desc:"Qiyma go'shtdan tayyor kabob",                 img:"https://images.pexels.com/photos/1352270/pexels-photo-1352270.jpeg?auto=compress&cs=tinysrgb&w=500", price:20000, emoji:"🌯", tag:"Kabob"},
+      {id:11, name:"Tovuq Kabob",     desc:"Marinadlangan tovuq go'shti",                  img:"https://images.pexels.com/photos/2338407/pexels-photo-2338407.jpeg?auto=compress&cs=tinysrgb&w=500", price:16000, emoji:"🍗", tag:"Kabob"},
+    ]
+  },
+  non: {
+    label: "Non & Somsa",
+    items: [
+      {id:12, name:"Tandir Non",    desc:"Tandir nonning yangi pishirilgani",          img:"https://images.pexels.com/photos/1775043/pexels-photo-1775043.jpeg?auto=compress&cs=tinysrgb&w=500", price:5000,  emoji:"🫓", tag:"Non"},
+      {id:13, name:"Somsa (1 dona)",desc:"Tandirda pishirilgan go'shtli somsa",         img:"https://images.pexels.com/photos/3892469/pexels-photo-3892469.jpeg?auto=compress&cs=tinysrgb&w=500", price:6000,  emoji:"🥐", tag:"Non"},
+      {id:14, name:"Qatlama",       desc:"Qatlamali yog'li non",                        img:"https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=500",   price:8000,  emoji:"🥞", tag:"Non"},
+    ]
+  },
+  ichimlik: {
+    label: "Ichimliklar",
+    items: [
+      {id:15, name:"Ko'k Choy",       desc:"Arzon bali ko'k choy",        img:"https://images.pexels.com/photos/1544943/pexels-photo-1544943.jpeg?auto=compress&cs=tinysrgb&w=500",                                                 price:5000,  emoji:"🍵", tag:"Choy"},
+      {id:16, name:"Qora Choy",       desc:"Issiq qora choy",             img:"https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=500",                                                   price:5000,  emoji:"☕",  tag:"Choy"},
+      {id:17, name:"Kompot",          desc:"Meva-sabzavotli kompot",       img:"https://images.pexels.com/photos/1187766/pexels-photo-1187766.jpeg?auto=compress&cs=tinysrgb&w=500",                                                 price:8000,  emoji:"🍹", tag:"Ichimlik"},
+      {id:18, name:"Ayron",           desc:"Yangi tayyorlangan ayron",     img:"https://images.pexels.com/photos/1399400/pexels-photo-1399400.jpeg?auto=compress&cs=tinysrgb&w=500",                                                 price:7000,  emoji:"🥛", tag:"Ichimlik"},
+      {id:19, name:"Coca-Cola (0.5L)",desc:"Sovuq Coca-Cola",              img:"https://images.pexels.com/photos/50593/coca-cola-cold-drink-soft-drink-coke-50593.jpeg?auto=compress&cs=tinysrgb&w=500",                             price:10000, emoji:"🥤", tag:"Ichimlik"},
+    ]
+  }
+};
+
+let orders = [], ci = null, cq = 1;
+try { orders = JSON.parse(localStorage.getItem('sp1') || '[]'); } catch(e) {}
+
+const fmt = p => 'UZS ' + p.toLocaleString('uz-UZ') + '.00';
+const all = () => Object.values(DB).flatMap(c => c.items);
+
+function gp(pg, bid) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + pg).classList.add('active');
+  document.querySelectorAll('.nitem').forEach(b => b.classList.remove('active'));
+  const b = document.getElementById(bid);
+  if (b) b.classList.add('active');
+  if (pg === 'orders') renderOrders();
+  document.querySelector('.content').scrollTop = 0;
+}
+
+function openCat(cat) {
+  const c = DB[cat];
+  document.getElementById('ittl').textContent = c.label;
+  document.getElementById('igrid').innerHTML = c.items.map(item => `
+    <div class="icard" onclick="od(${item.id})">
+      <div class="iimgw">
+        <img src="${item.img}" alt="${item.name}" loading="lazy"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="iimgph" style="display:none">${item.emoji}</div>
+      </div>
+      <div class="ibody">
+        <div class="iprice">${fmt(item.price)}</div>
+        <div class="iname">${item.emoji} ${item.name}</div>
+        <button class="gbtn" id="gb${item.id}" onclick="qa(event,${item.id})">Olish</button>
+      </div>
+    </div>
+  `).join('');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-items').classList.add('active');
+  document.querySelectorAll('.nitem').forEach(b => b.classList.remove('active'));
+  document.getElementById('n-catalog').classList.add('active');
+  document.querySelector('.content').scrollTop = 0;
+}
+
+function od(id) {
+  ci = all().find(i => i.id === id); cq = 1;
+  const w = document.getElementById('dimgw'), ph = document.getElementById('dimgph');
+  const oi = w.querySelector('img'); if (oi) oi.remove();
+  ph.style.display = 'none';
+  const img = new Image();
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;border-radius:22px 22px 0 0;';
+  img.onload = () => w.insertBefore(img, ph);
+  img.onerror = () => { ph.textContent = ci.emoji; ph.style.display = 'flex'; };
+  img.src = ci.img;
+  document.getElementById('dtag').textContent = ci.tag;
+  document.getElementById('dname').textContent = ci.name;
+  document.getElementById('ddesc').textContent = ci.desc;
+  document.getElementById('dchips').innerHTML = `<div class="chip"><strong>${ci.emoji} ${ci.name}</strong></div>`;
+  document.getElementById('dprice').textContent = fmt(ci.price);
+  document.getElementById('qn').textContent = 1;
+  updbtn();
+  document.getElementById('dov').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function updbtn() {
+  document.getElementById('dobtn').textContent = `Buyurtma berish — ${fmt(ci.price * cq)}`;
+}
+function dq(d) { cq = Math.max(1, cq + d); document.getElementById('qn').textContent = cq; updbtn(); }
+function dbgclick(e) { if (e.target === document.getElementById('dov')) cd(); }
+function cd() { document.getElementById('dov').classList.remove('open'); document.body.style.overflow = ''; }
+
+function openOrderModal() {
+  const prev = document.getElementById('oiprev');
+  prev.innerHTML = `
+    <img class="oipimg" src="${ci.img}" alt="${ci.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="oipimgph" style="display:none">${ci.emoji}</div>
+    <div class="oipinfo">
+      <div class="oipname">${ci.name}</div>
+      <div class="oipqty">${cq} ta buyurtma</div>
+    </div>
+    <div class="oiptotal">${fmt(ci.price * cq)}</div>
+  `;
+  document.getElementById('fname').value = '';
+  document.getElementById('fphone').value = '';
+  document.getElementById('faddress').value = '';
+  document.getElementById('fnote').value = '';
+  ['fname-err','fphone-err','faddress-err'].forEach(id => document.getElementById(id).classList.remove('show'));
+  const btn = document.getElementById('fsubmit');
+  btn.disabled = false; btn.textContent = 'Buyurtma berish';
+  document.getElementById('oov').classList.add('open');
+}
+
+function closeOrderModal() {
+  document.getElementById('oov').classList.remove('open');
+}
+
+function oovbgclick(e) {
+  if (e.target === document.getElementById('oov')) closeOrderModal();
+}
+
+function submitOrder() {
+  const name    = document.getElementById('fname').value.trim();
+  const phone   = document.getElementById('fphone').value.trim();
+  const address = document.getElementById('faddress').value.trim();
+  const note    = document.getElementById('fnote').value.trim();
+
+  let valid = true;
+  if (!name) { document.getElementById('fname-err').classList.add('show'); valid = false; }
+  else document.getElementById('fname-err').classList.remove('show');
+  if (!phone || phone.length < 9) { document.getElementById('fphone-err').classList.add('show'); valid = false; }
+  else document.getElementById('fphone-err').classList.remove('show');
+  if (!address) { document.getElementById('faddress-err').classList.add('show'); valid = false; }
+  else document.getElementById('faddress-err').classList.remove('show');
+  if (!valid) return;
+
+  const btn = document.getElementById('fsubmit');
+  btn.disabled = true; btn.textContent = '⏳ Yuborilmoqda...';
+
+  const order = {
+    id: Date.now(),
+    item: ci,
+    qty: cq,
+    total: ci.price * cq,
+    name,
+    phone,
+    address,
+    note,
+    status: 'Tayyorlanmoqda',
+    time: new Date().toLocaleTimeString('uz-UZ', {hour:'2-digit', minute:'2-digit'})
+  };
+  orders.unshift(order);
+  try { localStorage.setItem('sp1', JSON.stringify(orders)); } catch(e) {}
+
+  const payload = {
+    type: 'order',
+    name,
+    phone,
+    location: address,
+    note,
+    items: [{ id: ci.id, name: ci.name, price: ci.price, qty: cq, emoji: ci.emoji }],
+    total: ci.price * cq
+  };
+
+  if (window.Telegram?.WebApp) {
+    window.Telegram.WebApp.sendData(JSON.stringify(payload));
+  }
+
+  ubadge();
+  closeOrderModal();
+  cd();
+
+  document.getElementById('ssub').textContent = `${name}, ${phone} raqamiga qo'ng'iroq qilamiz. Yetkazib berish: ${address}`;
+  document.getElementById('sscreen').classList.add('open');
+}
+
+function closeSuccess() {
+  document.getElementById('sscreen').classList.remove('open');
+  document.body.style.overflow = '';
+  gp('orders', 'n-orders');
+}
+
+function qa(e, id) {
+  e.stopPropagation();
+  ci = all().find(i => i.id === id); cq = 1;
+  openOrderModal();
+  const b = document.getElementById('gb' + id);
+  if (b) { b.classList.add('added'); b.textContent = '✓ Tanlandi'; setTimeout(() => { b.classList.remove('added'); b.textContent = 'Olish'; }, 1200); }
+}
+
+function ubadge() {
+  const b = document.getElementById('cb');
+  b.textContent = orders.length;
+  b.classList.toggle('h', orders.length === 0);
+}
+
+function renderOrders() {
+  const c = document.getElementById('oin');
+  if (!orders.length) {
+    c.innerHTML = '<div class="empty"><div class="ei">📋</div><h3>Hali buyurtma yo\'q</h3><p>Menyudan taom tanlang va buyurtma bering</p></div>';
+    return;
+  }
+  const total = orders.reduce((s, o) => s + o.total, 0);
+  const sc = {'Tayyorlanmoqda':'#ffa726','Yetkazilmoqda':'#66bb6a','Bajarildi':'#66bb6a'};
+  c.innerHTML = `
+    <div class="scard">
+      <div class="si"><div class="sl">Buyurtmalar</div><div class="sv">${orders.length} ta</div></div>
+      <div class="si"><div class="sl">Jami summa</div><div class="sv" style="font-size:14px;">${fmt(total)}</div></div>
+    </div>
+  ` + orders.map(o => `
+    <div class="ocard">
+      <div class="ocard-top">
+        <img class="ocimg" src="${o.item.img}" alt="${o.item.name}"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="ocimgph" style="display:none">${o.item.emoji}</div>
+        <div class="ocinfo">
+          <div class="ocname">${o.item.name}</div>
+          <div class="ocmeta">${o.qty} ta × ${fmt(o.item.price)} · ${o.time}</div>
+          <div class="ocst" style="color:${sc[o.status]||'#ffa726'}">
+            <div class="sdot" style="background:${sc[o.status]||'#ffa726'}"></div>${o.status}
+          </div>
+        </div>
+        <div class="ocp">${fmt(o.total)}</div>
+      </div>
+      <div class="ocard-detail">
+        <div class="ocd-row">👤 <strong>${o.name||''}</strong></div>
+        <div class="ocd-row">📞 <strong>${o.phone}</strong></div>
+        <div class="ocd-row">📍 <strong>${o.address}</strong></div>
+        ${o.note ? `<div class="ocd-row">💬 <strong>${o.note}</strong></div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+ubadge();
+</script>
+</body>
+</html>
